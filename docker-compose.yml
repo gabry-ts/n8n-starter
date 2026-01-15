@@ -19,7 +19,7 @@ services:
     environment:
       <<: *postgres-env
     volumes:
-      - n8n_postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - "12000:5432"
     healthcheck:
@@ -37,7 +37,7 @@ services:
     container_name: redis
     restart: unless-stopped
     volumes:
-      - n8n_redis_data:/data
+      - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -45,7 +45,27 @@ services:
       retries: 10
 
 volumes:
-  n8n_postgres_data:
-  n8n_redis_data:
+  postgres_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/data/postgres
+  redis_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/data/redis
   n8n_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/data/n8n
   watch_node_modules:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/data/watch_node_modules
