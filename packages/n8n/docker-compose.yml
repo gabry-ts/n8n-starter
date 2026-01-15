@@ -42,7 +42,7 @@ services:
       N8N_DIAGNOSTICS_ENABLED: "false"
       N8N_PERSONALIZATION_ENABLED: "false"
       EXTERNAL_HOOK_FILES: /hooks/workflowHooks.js
-      WATCH_SERVER_HOST: watch-server
+      WATCH_SERVER_HOST: n8n-watch-server
       WATCH_SERVER_PORT: ${WATCH_SERVER_PORT:-3456}
       WATCH_SERVER_SECRET: ${WATCH_SERVER_SECRET:-local-webhook-secret}
     ports:
@@ -55,7 +55,11 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:5678/healthz || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "wget -q --spider http://localhost:5678/healthz || exit 1",
+        ]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -63,6 +67,7 @@ services:
 
   n8n-worker:
     image: n8nio/n8n:2.3.5
+    container_name: n8n-worker
     restart: unless-stopped
     command: worker
     deploy:
@@ -96,7 +101,7 @@ services:
       - ./credentials:/credentials
       - ./community-nodes.txt:/community-nodes/community-nodes.txt:ro
 
-  watch-server:
+  n8n-watch-server:
     image: node:20-alpine
     container_name: n8n-watch-server
     restart: unless-stopped

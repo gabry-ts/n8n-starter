@@ -135,17 +135,17 @@ app.post('/webhook/credential-save', authMiddleware, async (req: Request, res: R
     event: payload.event,
   });
 
-  if (!payload.id || !payload.name || !payload.type) {
-    log('warn', 'invalid payload: missing id, name, or type');
+  if (!payload.name || !payload.type) {
+    log('warn', 'invalid payload: missing name or type');
     res.status(400).json({ error: 'missing credential data' });
     return;
   }
 
   try {
     const baseDir = getBaseDir();
-    await updateCredentialInManifest(baseDir, payload.id, payload.name, payload.type);
-    log('info', `saved credential: ${payload.name} (${payload.id}) type=${payload.type}`);
-    res.json({ status: 'ok', id: payload.id });
+    await updateCredentialInManifest(baseDir, payload.name, payload.type);
+    log('info', `saved credential: ${payload.name} type=${payload.type}`);
+    res.json({ status: 'ok', name: payload.name });
   } catch (error) {
     log('error', `failed to save credential ${payload.name}:`, error);
     res.status(500).json({ error: 'failed to save credential' });

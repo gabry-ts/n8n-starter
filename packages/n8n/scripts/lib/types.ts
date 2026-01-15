@@ -14,7 +14,7 @@ export interface WorkflowDeletePayload {
 
 // credential payloads
 export interface CredentialSavePayload {
-  id: string;
+  id?: string;  // optional - n8n doesn't provide id on create hook
   name: string;
   type: string;
   event: string;

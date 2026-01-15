@@ -115,10 +115,17 @@ export function writeManifest(baseDir: string, manifest: Record<string, unknown>
   fs.writeFileSync(manifestPath, yaml.stringify(manifest), 'utf-8');
 }
 
+// generate key from credential name (sanitized)
+function toCredentialKey(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
 // update credential in manifest
 export async function updateCredentialInManifest(
   baseDir: string,
-  id: string,
   name: string,
   type: string
 ): Promise<void> {
@@ -128,21 +135,19 @@ export async function updateCredentialInManifest(
   const manifest = readManifest(baseDir);
   log('info', `current manifest:`, manifest);
 
-  // convert array format to object format if needed
+  // use _autoCredentials section (separate from manual credentials array)
   let credentials: Record<string, ManifestCredential> = {};
-  if (Array.isArray(manifest.credentials)) {
-    // keep existing array entries but also maintain our object format
-    credentials = (manifest._autoCredentials || {}) as Record<string, ManifestCredential>;
-  } else {
-    credentials = (manifest.credentials || {}) as Record<string, ManifestCredential>;
-  }
+  credentials = (manifest._autoCredentials || {}) as Record<string, ManifestCredential>;
+
+  // use sanitized name as key
+  const key = toCredentialKey(name);
 
   // fetch schema to get field names
   const fieldNames = await fetchCredentialSchema(type);
   log('info', `schema fields for ${type}:`, fieldNames);
 
   // get existing entry if any
-  const existing = credentials[id];
+  const existing = credentials[key];
   const existingData = existing?.data || {};
 
   // build data object - keep existing values, add new keys with placeholders
@@ -159,7 +164,7 @@ export async function updateCredentialInManifest(
   }
 
   // update or create credential entry
-  credentials[id] = {
+  credentials[key] = {
     name,
     type,
     data
@@ -172,16 +177,11 @@ export async function updateCredentialInManifest(
   log('info', `manifest written`);
 }
 
-// delete credential from manifest
+// delete credential from manifest by id
+// note: since we use name as key, this searches by id in credentials or does nothing
 export function deleteCredentialFromManifest(baseDir: string, id: string): boolean {
-  const manifest = readManifest(baseDir);
-  const credentials = (manifest.credentials || {}) as Record<string, ManifestCredential>;
-
-  if (credentials[id]) {
-    delete credentials[id];
-    manifest.credentials = credentials;
-    writeManifest(baseDir, manifest);
-    return true;
-  }
+  // id-based delete not supported with name-based keys
+  // credentials will be cleaned up manually or on next bootstrap
+  log('warn', `delete by id not supported (id=${id}), credential will remain in manifest`);
   return false;
 }

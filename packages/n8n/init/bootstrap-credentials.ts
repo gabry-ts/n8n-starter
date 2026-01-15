@@ -327,7 +327,7 @@ async function main(): Promise<void> {
   for (const [, cred] of Object.entries(autoCredentials)) {
     console.log(`  processing: ${cred.name} (${cred.type})`);
 
-    // resolve env placeholders in data
+    // resolve env placeholders in data - skip fields without env vars
     const data: Record<string, unknown> = {};
     const missingVars: string[] = [];
 
@@ -335,13 +335,19 @@ async function main(): Promise<void> {
       const resolved = resolveEnvPlaceholder(value);
       if (resolved.missing.length > 0) {
         missingVars.push(...resolved.missing);
-      } else {
+        // skip this field, don't fail the whole credential
+      } else if (resolved.value !== null) {
         data[field] = resolved.value;
       }
     }
 
     if (missingVars.length > 0) {
-      console.log(`    skipped: missing env vars: ${missingVars.join(', ')}`);
+      console.log(`    note: skipping optional fields: ${missingVars.join(', ')}`);
+    }
+
+    // only skip if no data at all
+    if (Object.keys(data).length === 0) {
+      console.log(`    skipped: no env vars resolved`);
       skipped++;
       continue;
     }

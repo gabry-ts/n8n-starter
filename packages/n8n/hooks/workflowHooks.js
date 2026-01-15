@@ -3,7 +3,7 @@
 
 const http = require('http');
 
-const WATCH_SERVER_HOST = process.env.WATCH_SERVER_HOST || 'watch-server';
+const WATCH_SERVER_HOST = process.env.WATCH_SERVER_HOST || 'n8n-watch-server';
 const WATCH_SERVER_PORT = process.env.WATCH_SERVER_PORT || '3456';
 const WATCH_SERVER_SECRET = process.env.WATCH_SERVER_SECRET || 'local-webhook-secret';
 
