@@ -143,8 +143,8 @@ app.post('/webhook/credential-save', authMiddleware, async (req: Request, res: R
 
   try {
     const baseDir = getBaseDir();
-    await updateCredentialInManifest(baseDir, payload.name, payload.type);
-    log('info', `saved credential: ${payload.name} type=${payload.type}`);
+    await updateCredentialInManifest(baseDir, payload.name, payload.type, payload.id);
+    log('info', `saved credential: ${payload.name} type=${payload.type} id=${payload.id}`);
     res.json({ status: 'ok', name: payload.name });
   } catch (error) {
     log('error', `failed to save credential ${payload.name}:`, error);

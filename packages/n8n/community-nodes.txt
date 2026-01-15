@@ -1,6 +1,9 @@
 # community nodes to install
 # one package per line, comments start with #
 #
-# example:
+# examples:
 # n8n-nodes-evolution-api
 # @n8n/n8n-nodes-langchain
+# n8n-nodes-baserow
+# n8n-nodes-puppeteer
+# @custom-nodes/your-package

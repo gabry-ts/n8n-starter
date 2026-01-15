@@ -34,6 +34,7 @@ export interface CredentialSchema {
 
 // manifest credential entry
 export interface ManifestCredential {
+  id?: string;  // n8n credential id for delete tracking
   name: string;
   type: string;
   data: Record<string, string>;

@@ -127,7 +127,8 @@ function toCredentialKey(name: string): string {
 export async function updateCredentialInManifest(
   baseDir: string,
   name: string,
-  type: string
+  type: string,
+  id?: string
 ): Promise<void> {
   const manifestPath = path.join(baseDir, 'credentials', 'manifest.yml');
   log('info', `manifest path: ${manifestPath}`);
@@ -165,6 +166,7 @@ export async function updateCredentialInManifest(
 
   // update or create credential entry
   credentials[key] = {
+    ...(id && { id }),  // include id if provided for delete tracking
     name,
     type,
     data
@@ -178,10 +180,21 @@ export async function updateCredentialInManifest(
 }
 
 // delete credential from manifest by id
-// note: since we use name as key, this searches by id in credentials or does nothing
 export function deleteCredentialFromManifest(baseDir: string, id: string): boolean {
-  // id-based delete not supported with name-based keys
-  // credentials will be cleaned up manually or on next bootstrap
-  log('warn', `delete by id not supported (id=${id}), credential will remain in manifest`);
+  const manifest = readManifest(baseDir);
+  const credentials = (manifest._autoCredentials || {}) as Record<string, ManifestCredential>;
+
+  // find credential by id
+  for (const [key, cred] of Object.entries(credentials)) {
+    if (cred.id === id) {
+      delete credentials[key];
+      manifest._autoCredentials = credentials;
+      writeManifest(baseDir, manifest);
+      log('info', `deleted credential from manifest: ${cred.name} (id=${id})`);
+      return true;
+    }
+  }
+
+  log('warn', `credential not found in manifest (id=${id})`);
   return false;
 }
