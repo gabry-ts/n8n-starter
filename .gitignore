@@ -54,3 +54,6 @@ data/
 
 # database backups
 backup-*.sql
+
+# credentials exports (contain secrets)
+credentials-export-*.json
