@@ -51,3 +51,6 @@ packages/n8n/workflows/my-workflow.json
 # generated secrets
 packages/n8n/credentials/.n8n-api-key
 data/
+
+# database backups
+backup-*.sql

@@ -9,6 +9,8 @@
     "n8n:dev": "docker compose up -d",
     "n8n:dev:logs": "docker compose logs -f",
     "n8n:dev:down": "docker compose down",
-    "n8n:dev:reset": "docker compose down -v && yarn n8n:dev"
+    "n8n:dev:reset": "docker compose down -v && yarn n8n:dev",
+    "n8n:backup": "docker exec postgres pg_dump -U ${POSTGRES_USER:-dbuser} -d ${POSTGRES_DB:-app_db} > backup-$(date +%Y%m%d-%H%M%S).sql",
+    "n8n:restore": "docker exec -i postgres psql -U ${POSTGRES_USER:-dbuser} -d ${POSTGRES_DB:-app_db}"
   }
 }
