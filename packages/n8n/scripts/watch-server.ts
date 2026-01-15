@@ -82,9 +82,9 @@ app.post('/webhook/workflow-save', authMiddleware, async (req: Request, res: Res
     const baseDir = getBaseDir();
     const outputPath = getOutputPath(payload.workflow, payload.folderPath, baseDir);
 
-    saveWorkflow(payload.workflow, outputPath);
+    saveWorkflow(payload.workflow, outputPath, payload.workflowId);
 
-    log('info', `saved workflow: ${payload.originalName} -> ${outputPath}`);
+    log('info', `saved workflow: ${payload.originalName} (id=${payload.workflowId}) -> ${outputPath}`);
     res.json({ status: 'ok', path: outputPath });
   } catch (error) {
     log('error', `failed to save workflow ${payload.originalName}:`, error);

@@ -94,10 +94,11 @@ function sendWorkflowToServer(workflow, event) {
   }
   const folderPath = getFolderPath(workflow);
   const cleanedWorkflow = cleanWorkflow(workflow);
-  console.log('[hooks] sending', event, ':', workflow.name, 'active=' + cleanedWorkflow.active);
+  console.log('[hooks] sending', event, ':', workflow.name, 'id=' + workflow.id, 'active=' + cleanedWorkflow.active);
   sendToServer('/webhook/workflow-save', {
     workflow: cleanedWorkflow,
     originalName: workflow.name,
+    workflowId: workflow.id,
     folderPath: folderPath,
     event: event
   });

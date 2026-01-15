@@ -2,6 +2,7 @@
 export interface WorkflowSavePayload {
   workflow: Record<string, unknown>;
   originalName: string;
+  workflowId?: string;
   folderPath: string | null;
   event: string;
 }
