@@ -1,10 +1,9 @@
-# n8n workflow versioning system
-# infrastructure services + package includes
+# n8n production - import only, no auto-export
 
-name: n8n-starter
+name: n8n-starter-prd
 
 include:
-  - packages/n8n/docker-compose.yml
+  - packages/n8n/docker-compose.prd.yml
 
 x-postgres-env: &postgres-env
   POSTGRES_USER: ${POSTGRES_USER:-dbuser}
@@ -21,8 +20,6 @@ services:
       TZ: ${TZ:-UTC}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "12000:5432"
     healthcheck:
       test:
         [
@@ -49,26 +46,5 @@ services:
 
 volumes:
   postgres_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${PWD}/data/postgres
   redis_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${PWD}/data/redis
   n8n_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${PWD}/data/n8n
-  watch_node_modules:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${PWD}/data/watch_node_modules
