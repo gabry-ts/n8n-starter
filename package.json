@@ -1,0 +1,14 @@
+{
+  "name": "n8n-starter",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "n8n:dev": "docker compose up -d",
+    "n8n:dev:logs": "docker compose logs -f",
+    "n8n:dev:down": "docker compose down",
+    "n8n:dev:reset": "docker compose down -v && yarn n8n:dev"
+  }
+}

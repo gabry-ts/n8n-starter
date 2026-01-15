@@ -1,0 +1,118 @@
+# n8n services - included from root docker-compose.yml
+
+x-n8n-env: &n8n-env
+  DB_TYPE: postgresdb
+  DB_POSTGRESDB_HOST: postgres
+  DB_POSTGRESDB_PORT: 5432
+  DB_POSTGRESDB_DATABASE: ${POSTGRES_DB:-app_db}
+  DB_POSTGRESDB_USER: ${POSTGRES_USER:-dbuser}
+  DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD:-dbpassword_change_me}
+  N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY:-change-me-min-24-characters}
+  EXECUTIONS_MODE: queue
+  QUEUE_BULL_REDIS_HOST: ${REDIS_HOST:-redis}
+  QUEUE_BULL_REDIS_PORT: ${REDIS_PORT:-6379}
+  GENERIC_TIMEZONE: Europe/Rome
+  N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
+
+# credential env vars for manifest.yml bootstrap
+# add new credential vars here with defaults, actual values in .env
+x-n8n-credential-yaml-file: &n8n-credential-yaml-file
+  TEST_HEADER_NAME: ${TEST_HEADER_NAME:-X-API-Key}
+  TEST_HEADER_VALUE: ${TEST_HEADER_VALUE:-test-secret-key-12345}
+  # MY_API_KEY: ${MY_API_KEY:-}
+
+services:
+  n8n:
+    image: n8nio/n8n:2.3.5
+    container_name: n8n
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - ../../.env
+    environment:
+      <<: *n8n-env
+      N8N_HOST: ${N8N_HOST:-localhost}
+      N8N_PORT: 5678
+      N8N_PROTOCOL: ${N8N_PROTOCOL:-http}
+      WEBHOOK_URL: ${WEBHOOK_URL:-http://localhost:5678/}
+      N8N_DIAGNOSTICS_ENABLED: "false"
+      N8N_PERSONALIZATION_ENABLED: "false"
+      EXTERNAL_HOOK_FILES: /hooks/workflowHooks.js
+      WATCH_SERVER_HOST: watch-server
+      WATCH_SERVER_PORT: ${WATCH_SERVER_PORT:-3456}
+      WATCH_SERVER_SECRET: ${WATCH_SERVER_SECRET:-local-webhook-secret}
+    ports:
+      - "12001:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./workflows:/workflows:ro
+      - ./credentials:/credentials:ro
+      - ./hooks:/hooks:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:5678/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  n8n-worker:
+    image: n8nio/n8n:2.3.5
+    restart: unless-stopped
+    command: worker
+    deploy:
+      replicas: 1
+    depends_on:
+      n8n:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - ../../.env
+    environment:
+      <<: *n8n-env
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+  n8n-init:
+    build: ./init
+    container_name: n8n-init
+    depends_on:
+      n8n:
+        condition: service_healthy
+    env_file:
+      - ../../.env
+    environment:
+      <<: [*n8n-env, *n8n-credential-yaml-file]
+      N8N_OWNER_EMAIL: ${N8N_OWNER_EMAIL:-admin@admin.local}
+      N8N_OWNER_PASSWORD: ${N8N_OWNER_PASSWORD:-password}
+    volumes:
+      - ./workflows:/workflows:ro
+      - ./credentials:/credentials
+      - ./community-nodes.txt:/community-nodes/community-nodes.txt:ro
+
+  watch-server:
+    image: node:20-alpine
+    container_name: n8n-watch-server
+    restart: unless-stopped
+    depends_on:
+      n8n-init:
+        condition: service_completed_successfully
+    working_dir: /app
+    command: sh -c "npm install && npx ts-node scripts/watch-server.ts"
+    env_file:
+      - ../../.env
+    environment:
+      WATCH_SERVER_PORT: ${WATCH_SERVER_PORT:-3456}
+      WATCH_SERVER_SECRET: ${WATCH_SERVER_SECRET:-local-webhook-secret}
+    ports:
+      - "${WATCH_SERVER_PORT:-3456}:${WATCH_SERVER_PORT:-3456}"
+    volumes:
+      - ./:/app
+      - watch_node_modules:/app/node_modules
+      - ./workflows:/app/workflows

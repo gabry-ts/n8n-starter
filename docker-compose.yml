@@ -1,0 +1,45 @@
+# n8n workflow versioning system
+# infrastructure services + package includes
+
+include:
+  - packages/n8n/docker-compose.yml
+
+x-postgres-env: &postgres-env
+  POSTGRES_USER: ${POSTGRES_USER:-dbuser}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dbpassword_change_me}
+  POSTGRES_DB: ${POSTGRES_DB:-app_db}
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: n8n-postgres
+    restart: unless-stopped
+    environment:
+      <<: *postgres-env
+    volumes:
+      - n8n_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "12000:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dbuser} -d ${POSTGRES_DB:-app_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: n8n-redis
+    restart: unless-stopped
+    volumes:
+      - n8n_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  n8n_postgres_data:
+  n8n_redis_data:
+  n8n_data:
+  watch_node_modules:
