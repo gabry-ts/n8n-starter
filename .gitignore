@@ -56,3 +56,9 @@ backup-*.sql
 
 # credentials exports (contain secrets)
 credentials-export-*.json
+
+# lock files (using yarn.lock)
+package-lock.json
+
+# leftover local packages
+backend/
