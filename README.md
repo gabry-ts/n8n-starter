@@ -4,7 +4,7 @@ GitOps for n8n. Version your workflows. Let AI agents create and manage automati
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Docker](https://img.shields.io/badge/Docker-ready-blue.svg)
-![GitHub Stars](https://img.shields.io/github/stars/gabry-ts/n8n-monorepo-starter.svg)
+![GitHub Stars](https://img.shields.io/github/stars/gabry-ts/n8n-starter.svg)
 
 ## Why
 
