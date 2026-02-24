@@ -41,7 +41,6 @@ temp/
 *.tmp
 
 # claude
-CLAUDE.md
 .claude/
 
 # default n8n workflows (not versioned)
