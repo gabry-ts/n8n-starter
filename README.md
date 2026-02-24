@@ -14,24 +14,7 @@ n8n-starter uses Git as source of truth -- every workflow and credential is a fi
 
 ## How it works
 
-```mermaid
-flowchart LR
-    Git["Git repo<br/>(source of truth)"]
-    Init["n8n-init"]
-    N8N["n8n"]
-    Watch["watch-server"]
-    Worker["n8n-worker x N"]
-    Redis["Redis"]
-    Postgres["Postgres"]
-
-    Git -->|startup import| Init
-    Init -->|workflows + credentials| N8N
-    N8N -->|on save / delete| Watch
-    Watch -->|export to disk| Git
-    N8N --- Redis
-    Redis --- Worker
-    N8N --- Postgres
-```
+![architecture](docs/architecture.png)
 
 On startup, `n8n-init` reads workflow JSON files and `credentials/manifest.yml` from the repo and imports them into n8n. At runtime, every save in the n8n UI triggers an external hook that sends the workflow to `watch-server`, which writes it back to disk. The loop closes itself.
 
