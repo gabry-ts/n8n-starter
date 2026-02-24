@@ -6,6 +6,8 @@ GitOps for n8n. Version your workflows. Let AI agents create and manage automati
 ![Docker](https://img.shields.io/badge/Docker-ready-blue.svg)
 ![GitHub Stars](https://img.shields.io/github/stars/gabry-ts/n8n-starter.svg)
 
+![n8n-starter overview](docs/infographic.png)
+
 ## Why
 
 n8n has no native workflow versioning. If your instance dies, your workflows die with it.
@@ -14,7 +16,7 @@ n8n-starter uses Git as source of truth -- every workflow and credential is a fi
 
 ## How it works
 
-![architecture](docs/architecture.png)
+![architecture](docs/architecture.svg)
 
 On startup, `n8n-init` reads workflow JSON files and `credentials/manifest.yml` from the repo and imports them into n8n. At runtime, every save in the n8n UI triggers an external hook that sends the workflow to `watch-server`, which writes it back to disk. The loop closes itself.
 
