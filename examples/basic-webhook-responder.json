@@ -1,0 +1,70 @@
+{
+  "name": "Basic Webhook Responder",
+  "active": false,
+  "nodes": [
+    {
+      "id": "webhook-trigger",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [100, 300],
+      "parameters": {
+        "path": "transform",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "webhookId": "transform"
+    },
+    {
+      "id": "transform-data",
+      "name": "Transform",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [340, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// transform incoming webhook data\nconst results = [];\n\nfor (const item of items) {\n  const body = item.json.body || item.json;\n\n  results.push({\n    json: {\n      original: body,\n      transformed: {\n        message: typeof body.message === 'string' ? body.message.toUpperCase() : 'NO MESSAGE PROVIDED',\n        receivedAt: new Date().toISOString(),\n        wordCount: typeof body.message === 'string' ? body.message.split(/\\s+/).length : 0\n      }\n    }\n  });\n}\n\nreturn results;"
+      }
+    },
+    {
+      "id": "respond-webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [580, 300],
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Transform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}
