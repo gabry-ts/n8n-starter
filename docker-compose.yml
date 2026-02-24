@@ -49,26 +49,6 @@ services:
 
 volumes:
   postgres_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${PWD}/data/postgres
   redis_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${PWD}/data/redis
   n8n_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${PWD}/data/n8n
   watch_node_modules:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${PWD}/data/watch_node_modules
