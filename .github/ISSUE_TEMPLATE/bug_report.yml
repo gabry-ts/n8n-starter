@@ -1,0 +1,27 @@
+name: Bug Report
+description: Report a bug with n8n-starter
+labels: ["bug"]
+body:
+  - type: textarea
+    attributes:
+      label: Describe the bug
+      description: A clear description of what the bug is.
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: n8n version
+      placeholder: "2.3.5"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+      description: Steps to reproduce the behavior.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Relevant log output
+      description: Paste any relevant Docker logs.
+      render: text

@@ -2,9 +2,10 @@
 
 GitOps for n8n. Version your workflows. Let AI agents create and manage automations.
 
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Docker](https://img.shields.io/badge/Docker-ready-blue.svg)
-![GitHub Stars](https://img.shields.io/github/stars/gabry-ts/n8n-starter.svg)
+[![CI](https://github.com/gabry-ts/n8n-starter/actions/workflows/ci.yml/badge.svg)](https://github.com/gabry-ts/n8n-starter/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Docker](https://img.shields.io/badge/Docker-ready-blue.svg)](https://docs.docker.com/)
+[![GitHub Stars](https://img.shields.io/github/stars/gabry-ts/n8n-starter)](https://github.com/gabry-ts/n8n-starter)
 
 ![n8n-starter overview](docs/infographic.png)
 
@@ -12,27 +13,57 @@ GitOps for n8n. Version your workflows. Let AI agents create and manage automati
 
 n8n has no native workflow versioning. If your instance dies, your workflows die with it.
 
-n8n-starter uses Git as source of truth -- every workflow and credential is a file you can version, review, and restore. Two-way sync keeps your repo and n8n instance in lockstep.
+**n8n-starter** uses Git as source of truth — every workflow and credential is a file you can version, review, and restore. Two-way sync keeps your repo and n8n instance in lockstep.
 
-## How it works
+## How It Works
 
-![architecture](docs/architecture.svg)
+```mermaid
+graph LR
+    subgraph Git Repository
+        W[workflows/*.json]
+        C[credentials/manifest.yml]
+    end
 
-On startup, `n8n-init` reads workflow JSON files and `credentials/manifest.yml` from the repo and imports them into n8n. At runtime, every save in the n8n UI triggers an external hook that sends the workflow to `watch-server`, which writes it back to disk. The loop closes itself.
+    subgraph Docker
+        I[n8n-init<br>import on boot] --> N[n8n]
+        N -->|external hook| WS[watch-server]
+        WK[n8n-worker] --> N
+    end
 
-## AI agent integration
+    subgraph Infra
+        PG[(PostgreSQL)]
+        RD[(Redis)]
+    end
+
+    W --> I
+    C --> I
+    WS -->|write back| W
+    N --> PG
+    N --> RD
+```
+
+1. **Boot** — `n8n-init` reads workflow JSON files and `credentials/manifest.yml` from the repo and imports them into n8n
+2. **Runtime** — every save in the n8n UI triggers an external hook that sends the workflow to `watch-server`, which writes it back to disk
+3. **Loop closes** — commit and push, your Git repo is always up to date
+
+## AI Agent Integration
 
 Any AI agent (Claude Code, GPT, Copilot, custom scripts) can create n8n workflows by writing a JSON file to `workflows/` and committing. On next deploy, the init container picks it up automatically.
 
-- **Write a file** -- drop a valid n8n workflow JSON into `workflows/` (subdirectories become n8n folders)
-- **Commit and deploy** -- `docker compose up -d` imports everything
-- **Branch = environment** -- `main` goes to production, feature branches to staging
+```
+# Write a file → commit → deploy → done
+echo '{ ... }' > workflows/my-automation.json
+git add . && git commit -m "feat: add my automation"
+docker compose up -d
+```
 
-This makes n8n automations fully programmable. An AI agent can design, test, and ship workflows without ever touching the n8n UI.
+- **Write a file** — drop a valid n8n workflow JSON into `workflows/` (subdirectories become n8n folders)
+- **Commit and deploy** — `docker compose up -d` imports everything
+- **Branch = environment** — `main` goes to production, feature branches to staging
 
 See `CLAUDE.md` for detailed instructions on how AI agents should interact with this project.
 
-## Quick start
+## Quick Start
 
 ```bash
 cp .env.example .env
@@ -44,15 +75,15 @@ Default login: `admin@admin.local` / `password`
 
 ## Services
 
-| Service      | Port  | Description                              |
-| ------------ | ----- | ---------------------------------------- |
-| n8n          | 12001 | n8n UI + API                             |
-| n8n-worker   | -     | queue-based workflow executor (scalable) |
-| postgres     | 12000 | shared database                          |
-| redis        | -     | job queue (Bull)                         |
-| watch-server | 3456  | auto-export webhook receiver             |
+| Service | Port | Description |
+|---------|------|-------------|
+| n8n | 12001 | n8n UI + API |
+| n8n-worker | - | Queue-based workflow executor (scalable) |
+| postgres | 12000 | Shared database |
+| redis | - | Job queue (Bull) |
+| watch-server | 3456 | Auto-export webhook receiver |
 
-## Scaling workers
+## Scaling Workers
 
 ```bash
 docker compose up -d --scale n8n-worker=5
@@ -62,7 +93,7 @@ docker compose up -d --scale n8n-worker=5
 
 Credentials are defined in `packages/n8n/credentials/manifest.yml`. Two formats:
 
-**Manual** -- explicit env var mapping:
+**Manual** — explicit env var mapping:
 
 ```yaml
 credentials:
@@ -73,13 +104,11 @@ credentials:
       value: "MY_HEADER_VALUE"
 ```
 
-**Auto-generated** -- when you create a credential in the n8n UI, the watch-server fetches its schema and writes an `_autoCredentials` entry with `${ENV_VAR}` placeholders. Fill in the env vars in `.env` and they get bootstrapped on next startup.
+**Auto-generated** — when you create a credential in the n8n UI, the watch-server fetches its schema and writes an `_autoCredentials` entry with `${ENV_VAR}` placeholders. Fill in the env vars in `.env` and they get bootstrapped on next startup.
 
 Actual secret values live in `.env`, never in the manifest.
 
-## Production mode
-
-Use `docker-compose.prd.yml` for production:
+## Production Mode
 
 ```bash
 docker compose -f docker-compose.prd.yml up -d
@@ -91,7 +120,7 @@ Differences from dev:
 - Credentials mounted read-only
 - Standard Docker volumes instead of local bind mounts
 
-## Adding packages
+## Adding Packages
 
 To add a new package (e.g., a backend service):
 
@@ -104,7 +133,7 @@ include:
   - packages/backend/docker-compose.yml
 ```
 
-## Environment variables
+## Environment Variables
 
 All env vars in `.env` are available to n8n services via `env_file`. See `.env.example` for available options.
 
@@ -114,4 +143,4 @@ Issues and PRs welcome. See `CLAUDE.md` for project conventions and context.
 
 ## License
 
-MIT
+[MIT](./LICENSE)
