@@ -128,6 +128,7 @@ yarn n8n:export-credentials               # export decrypted credentials to JSON
 
 When creating or modifying a workflow that requires credentials, always complete all steps:
 
+0. Before starting, clarify any ambiguity with the user -- do not assume credential types, env var names, node configurations, or workflow logic
 1. Write the workflow JSON in `workflows/` with a `credentials` reference in the relevant nodes
 2. Add the credential to `credentials/manifest.yml` under `credentials` (manual) or `_autoCredentials` (auto format)
 3. Add the env vars to `.env` with actual secret values
