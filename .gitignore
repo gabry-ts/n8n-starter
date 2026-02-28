@@ -40,8 +40,9 @@ tmp/
 temp/
 *.tmp
 
-# claude
-.claude/
+# claude (track skills, ignore the rest)
+.claude/*
+!.claude/skills/
 
 # default n8n workflows (not versioned)
 **/my-workflow*.json

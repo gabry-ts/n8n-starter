@@ -12,6 +12,7 @@
     "n8n:dev:reset": "docker compose down -v && yarn n8n:dev",
     "n8n:backup": "docker exec postgres pg_dump -U ${POSTGRES_USER:-dbuser} -d ${POSTGRES_DB:-app_db} > backup-$(date +%Y%m%d-%H%M%S).sql",
     "n8n:restore": "docker exec -i postgres psql -U ${POSTGRES_USER:-dbuser} -d ${POSTGRES_DB:-app_db}",
-    "n8n:export-credentials": "docker exec n8n n8n export:credentials --all --decrypted --output=/tmp/creds.json && docker cp n8n:/tmp/creds.json ./credentials-export-$(date +%Y%m%d-%H%M%S).json"
+    "n8n:export-credentials": "docker exec n8n n8n export:credentials --all --decrypted --output=/tmp/creds.json && docker cp n8n:/tmp/creds.json ./credentials-export-$(date +%Y%m%d-%H%M%S).json",
+    "skills:update": "bash scripts/update-n8n-skills.sh"
   }
 }

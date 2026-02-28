@@ -61,6 +61,8 @@ docker compose up -d
 - **Commit and deploy** — `docker compose up -d` imports everything
 - **Branch = environment** — `main` goes to production, feature branches to staging
 
+The `.claude/skills/n8n-skills/` directory contains the [n8n-skills](https://github.com/haunchen/n8n-skills) knowledge base (v2.2.0), giving Claude full awareness of 545 n8n nodes and workflow patterns. Update it with `yarn skills:update`.
+
 See `CLAUDE.md` for detailed instructions on how AI agents should interact with this project.
 
 ## Quick Start
