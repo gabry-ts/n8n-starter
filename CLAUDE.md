@@ -124,6 +124,19 @@ yarn n8n:export-credentials               # export decrypted credentials to JSON
   - Watch-server: `WATCH_SERVER_PORT`, `WATCH_SERVER_SECRET`
   - Credential secrets: add custom vars matching your `manifest.yml` mappings
 
+## Workflow + credential checklist
+
+When creating or modifying a workflow that requires credentials, always complete all steps:
+
+1. Write the workflow JSON in `workflows/` with a `credentials` reference in the relevant nodes
+2. Add the credential to `credentials/manifest.yml` under `credentials` (manual) or `_autoCredentials` (auto format)
+3. Add the env vars to `.env` with actual secret values
+4. Add the env vars to `.env.example` with placeholder values
+5. Add the env vars to `docker-compose.yml` under `x-n8n-credential-yaml-file` with defaults
+6. If the credential requires a community node, add the npm package to `community-nodes.txt`
+
+Never skip steps 3-5 -- without them the credential will not be available to the init container.
+
 ## Conventions
 
 - All code comments in english, lowercase
