@@ -46,10 +46,9 @@ temp/
 
 # default n8n workflows (not versioned)
 **/my-workflow*.json
-packages/n8n/workflows/my-workflow.json
 
 # generated secrets
-packages/n8n/credentials/.n8n-api-key
+credentials/.n8n-api-key
 data/
 
 # database backups

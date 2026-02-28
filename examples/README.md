@@ -26,7 +26,7 @@ No external services needed -- it monitors n8n itself inside the docker network.
 
 ## Usage
 
-Copy any JSON file to `packages/n8n/workflows/` and run:
+Copy any JSON file to `workflows/` and run:
 
 ```bash
 docker compose up -d

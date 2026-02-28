@@ -93,7 +93,7 @@ docker compose up -d --scale n8n-worker=5
 
 ## Credentials
 
-Credentials are defined in `packages/n8n/credentials/manifest.yml`. Two formats:
+Credentials are defined in `credentials/manifest.yml`. Two formats:
 
 **Manual** — explicit env var mapping:
 
@@ -121,19 +121,6 @@ Differences from dev:
 - No watch-server (import-only, no auto-export)
 - Credentials mounted read-only
 - Standard Docker volumes instead of local bind mounts
-
-## Adding Packages
-
-To add a new package (e.g., a backend service):
-
-1. Create `packages/backend/docker-compose.yml`
-2. Include it from the root:
-
-```yaml
-include:
-  - packages/n8n/docker-compose.yml
-  - packages/backend/docker-compose.yml
-```
 
 ## Environment Variables
 
