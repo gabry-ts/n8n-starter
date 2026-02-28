@@ -224,10 +224,22 @@ import_workflow() {
     run_sql_quiet "UPDATE workflow_entity SET \"isArchived\" = true WHERE id = '$WORKFLOW_ID';"
   fi
 
-  # handle active state
+  # handle active state via REST API so n8n registers webhooks in the running process
   if [ "$IS_ACTIVE" = "true" ]; then
-    echo "    publishing"
-    n8n publish:workflow --id="$WORKFLOW_ID" || true
+    echo "    activating via API"
+    N8N_API_KEY=$(cat /credentials/.n8n-api-key 2>/dev/null || echo "")
+    if [ -n "$N8N_API_KEY" ]; then
+      ACTIVATE_HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "http://n8n:5678/api/v1/workflows/${WORKFLOW_ID}/activate" \
+        -H "X-N8N-API-KEY: ${N8N_API_KEY}" 2>&1)
+      if [ "$ACTIVATE_HTTP_CODE" = "200" ]; then
+        echo "    activated"
+      else
+        echo "    activation failed (HTTP $ACTIVATE_HTTP_CODE)"
+      fi
+    else
+      echo "    no API key found, falling back to CLI"
+      n8n publish:workflow --id="$WORKFLOW_ID" || true
+    fi
   else
     echo "    stays inactive"
   fi
