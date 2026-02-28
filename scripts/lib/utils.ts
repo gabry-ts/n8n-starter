@@ -17,11 +17,13 @@ export function log(level: 'info' | 'warn' | 'error', message: string, data?: un
 export function getBaseDir(): string {
   const scriptDir = __dirname;
 
+  // scripts/lib -> scripts -> project root
   if (scriptDir.endsWith('lib')) {
-    return path.resolve(scriptDir, '..');
+    return path.resolve(scriptDir, '..', '..');
   }
 
-  return scriptDir;
+  // scripts -> project root
+  return path.resolve(scriptDir, '..');
 }
 
 // check if running in docker

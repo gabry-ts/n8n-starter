@@ -1,6 +1,6 @@
 FROM node:20-alpine
 
-RUN apk add --no-cache postgresql-client jq
+RUN apk add --no-cache postgresql-client jq curl
 RUN npm install -g n8n@2.3.5
 
 WORKDIR /app
