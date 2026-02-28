@@ -18,10 +18,10 @@ export function getBaseDir(): string {
   const scriptDir = __dirname;
 
   if (scriptDir.endsWith('lib')) {
-    return path.resolve(scriptDir, '..', '..');
+    return path.resolve(scriptDir, '..');
   }
 
-  return path.resolve(scriptDir, '..');
+  return scriptDir;
 }
 
 // check if running in docker
