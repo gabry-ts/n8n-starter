@@ -22,7 +22,7 @@ jobs:
           docker compose config --quiet
           docker compose -f docker-compose.prd.yml config --quiet
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: yarn
