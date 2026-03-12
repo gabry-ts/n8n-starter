@@ -1,7 +1,7 @@
-FROM node:20-alpine
+FROM node:24-alpine
 
 RUN apk add --no-cache postgresql-client jq curl
-RUN npm install -g n8n@2.3.5
+RUN npm install -g n8n@2.11.3
 
 WORKDIR /app
 RUN npm init -y && npm install pg bcrypt js-yaml typescript ts-node @types/node @types/pg @types/bcrypt @types/js-yaml
