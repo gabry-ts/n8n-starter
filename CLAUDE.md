@@ -8,7 +8,7 @@ n8n-starter is a GitOps system for n8n. The Git repository is the single source 
 
 ```
 n8n-starter/
-├── docker-compose.yml          # all services: postgres, redis, n8n, worker, init, watch-server
+├── docker-compose.yml          # all services: postgres, n8n, init, watch-server
 ├── docker-compose.prd.yml      # production: no watch-server, import-only
 ├── .env.example                # environment variables template
 ├── package.json                # single package with helper scripts
@@ -101,9 +101,6 @@ docker compose down -v                    # stop and reset all data
 # production
 docker compose -f docker-compose.prd.yml up -d
 
-# scaling
-docker compose up -d --scale n8n-worker=5
-
 # database
 yarn n8n:backup                           # pg_dump to backup-<timestamp>.sql
 yarn n8n:restore < backup.sql             # restore from backup
@@ -118,7 +115,6 @@ yarn n8n:export-credentials               # export decrypted credentials to JSON
 - All env vars are available to n8n services via `env_file`
 - Key variables:
   - Database: `POSTGRES_HOST`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`
-  - Redis: `REDIS_HOST`, `REDIS_PORT`
   - n8n: `N8N_ENCRYPTION_KEY` (min 24 chars, must be consistent across services), `N8N_HOST`, `WEBHOOK_URL`
   - Owner: `N8N_OWNER_EMAIL`, `N8N_OWNER_PASSWORD`
   - Watch-server: `WATCH_SERVER_PORT`, `WATCH_SERVER_SECRET`
