@@ -15,9 +15,6 @@ x-n8n-env: &n8n-env
   DB_POSTGRESDB_USER: ${POSTGRES_USER:-dbuser}
   DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
   N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY:?N8N_ENCRYPTION_KEY is required}
-  EXECUTIONS_MODE: queue
-  QUEUE_BULL_REDIS_HOST: ${REDIS_HOST:-redis}
-  QUEUE_BULL_REDIS_PORT: ${REDIS_PORT:-6379}
   GENERIC_TIMEZONE: ${TZ:-UTC}
   TZ: ${TZ:-UTC}
   N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
@@ -47,28 +44,12 @@ services:
       timeout: 5s
       retries: 10
 
-  redis:
-    image: redis:7-alpine
-    container_name: redis
-    restart: unless-stopped
-    environment:
-      TZ: ${TZ:-UTC}
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
   n8n:
     image: n8nio/n8n:2.11.3
     container_name: n8n
     restart: unless-stopped
     depends_on:
       postgres:
-        condition: service_healthy
-      redis:
         condition: service_healthy
     env_file:
       - ./.env
@@ -99,25 +80,6 @@ services:
       retries: 10
       start_period: 30s
 
-  n8n-worker:
-    image: n8nio/n8n:2.11.3
-    container_name: n8n-worker
-    restart: unless-stopped
-    command: worker
-    deploy:
-      replicas: 1
-    depends_on:
-      n8n:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    env_file:
-      - ./.env
-    environment:
-      <<: *n8n-env
-    volumes:
-      - n8n_data:/home/node/.n8n
-
   n8n-init:
     build: ./init
     container_name: n8n-init
@@ -137,5 +99,4 @@ services:
 
 volumes:
   postgres_data:
-  redis_data:
   n8n_data:
