@@ -21,7 +21,7 @@ n8n-starter/
 ├── hooks/
 │   └── workflowHooks.js        # n8n external hooks: workflow + credential events
 ├── init/
-│   ├── Dockerfile              # node:20-alpine + n8n 2.3.5 + pg + jq
+│   ├── Dockerfile              # node:24-alpine + n8n 2.11.3 + pg + jq
 │   ├── init.sh                 # shell: community nodes, folders, workflow import
 │   └── bootstrap-credentials.ts  # owner account setup + credential encryption
 ├── scripts/
@@ -79,7 +79,7 @@ n8n-starter/
 
 ## Init container
 
-- Dockerfile: `init/Dockerfile` (node:20-alpine + n8n@2.3.5 + postgresql-client + jq)
+- Dockerfile: `init/Dockerfile` (node:24-alpine + n8n@2.11.3 + postgresql-client + jq)
 - Runs once on startup after n8n passes its healthcheck
 - Steps in order:
   1. Installs community nodes from `community-nodes.txt`
