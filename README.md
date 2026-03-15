@@ -61,9 +61,19 @@ docker compose up -d
 - **Commit and deploy** — `docker compose up -d` imports everything
 - **Branch = environment** — `main` goes to production, feature branches to staging
 
-The `.claude/skills/n8n-skills/` directory contains the [n8n-skills](https://github.com/haunchen/n8n-skills) knowledge base (v2.2.0), giving Claude full awareness of 545 n8n nodes and workflow patterns. Update it with `yarn skills:update`.
+The `.claude/skills/n8n-skills/` directory contains the [n8n-skills](https://github.com/haunchen/n8n-skills) knowledge base (v2.2.0), giving AI agents full awareness of 545 n8n nodes and workflow patterns. Update it with `yarn skills:update`.
 
-See `CLAUDE.md` for detailed instructions on how AI agents should interact with this project.
+Both Claude Code and Gemini CLI are supported. Run the setup script to configure your preferred tooling:
+
+```bash
+./scripts/setup-ai.sh claude   # verify claude config (default, already in repo)
+./scripts/setup-ai.sh gemini   # generate .gemini/ config + GEMINI.md
+./scripts/setup-ai.sh all      # both
+```
+
+Gemini setup symlinks the existing skills and generates `GEMINI.md` from `CLAUDE.md`. Generated files are gitignored.
+
+See `CLAUDE.md` (or `GEMINI.md` after setup) for detailed instructions on how AI agents should interact with this project.
 
 ## Quick Start
 
